@@ -1,6 +1,11 @@
 # chain-reaction
 recreation of chain reaction game using python with any number of players and gridsizes
 
+# Requirements
+Python3
+Pygame
+A Brain 🙃
+
 # Features
 
 ✓Ability to change rows and columns independently
