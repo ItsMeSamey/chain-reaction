@@ -12,5 +12,7 @@ recreation of chain reaction game using python with any number of players and gr
 ✓Gridsize automatically adjusts to display width
 
 # Bugs
+
 →Grid goes out of bounds in some cases
+
 →No animation (to speed up gameplay)
