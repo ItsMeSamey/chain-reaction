@@ -2,9 +2,10 @@
 recreation of chain reaction game using python with any number of players and gridsizes
 
 # Requirements
-Python3
 
-Pygame
+Python3
+ 
+Pygame 
 
 A Brain 🙃
 
