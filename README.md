@@ -1,4 +1,4 @@
-# chain-reaction
+in# chain-reaction
 recreation of chain reaction game using python with any number of players and gridsizes
 
 # Requirements
@@ -21,6 +21,4 @@ A Brain 🙃
 
 # Bugs
 
-→Grid goes out of bounds in some cases
-
-→No animation (to speed up gameplay)
+→Grid goes out of bounds when large with value is set
