@@ -3,7 +3,9 @@ recreation of chain reaction game using python with any number of players and gr
 
 # Requirements
 Python3
+
 Pygame
+
 A Brain 🙃
 
 # Features
