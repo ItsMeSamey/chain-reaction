@@ -190,7 +190,7 @@ playernumber = 0
 redraw()
 
 while True:
-    clock.tick(30)
+    clock.tick(60)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
