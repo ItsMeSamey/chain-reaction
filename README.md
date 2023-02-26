@@ -1,6 +1,8 @@
 in# chain-reaction
 recreation of chain reaction game using python with any number of players and gridsizes
 
+open chainreaction.py file to change settings, under '#initialization'
+
 # Requirements
 
 Python3
@@ -20,7 +22,7 @@ A Brain 🙃
 ✓Gridsize automatically adjusts to display width
 
 
-open .py file change these, under '#initialization'
+
 
 # Bugs
 
