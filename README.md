@@ -19,6 +19,9 @@ A Brain 🙃
 
 ✓Gridsize automatically adjusts to display width
 
+
+open .py file change these, under '#initialization'
+
 # Bugs
 
-→Grid goes out of bounds when large with value is set
+→Grid goes out of bounds when large screen width value is set
