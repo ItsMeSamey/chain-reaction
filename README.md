@@ -1,22 +1,16 @@
 # chain-reaction
 recreation of chain reaction game using python with any number of players and gridsizes
 
-this was forked from https://github.com/farhanirani/Logic-Games
+# Features
 
-# Changes
+✓Ability to change rows and columns independently
 
-✓Fixed text scaling
-
-✓Added ability to change rows and columns independently
-
-✓Any number of players can play now instead of two
-
-✓Fixed faulty game logic
+✓Any number of players can play
 
 ✓Random colours for each player
 
-✓Gridsize now adjusts to display width
+✓Gridsize automatically adjusts to display width
 
-✓Increased speed by removing animation (they were faulty anyway)
-
-
+# Bugs
+→Grid goes out of bounds in some cases
+→No animation (to speed up gameplay)
