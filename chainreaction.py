@@ -237,7 +237,7 @@ def delayy():
 def randomcoords(x):
     return [[[[random.randint(0,screen_x),random.randint(0,screen_y)] for i in range(random.randint(3,22))] for j in range(x)], [randomcolor() for k in range(x)]]
 
-beziers = randomcoords(21)
+beziers = randomcoords(12)
 for i in range(len(beziers[1])):
     beziers[0][i].append(beziers[0][i][0])
     beziers[0][i].append(beziers[0][i][1])
