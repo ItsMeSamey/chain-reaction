@@ -1,7 +1,7 @@
 # chain-reaction
 recreation of chain reaction game using python with any number of players and gridsizes
 
-open chainreaction.py file to change settings, under '#initialization'
+change Gridsize etc… in settings
 
 # Requirements
 
@@ -25,5 +25,9 @@ A Brain 🙃
 
 
 # Bugs
+★only when rows>>columns 
+→textsize too large
 
-→Grid goes out of bounds when large screen width value is set
+→1 pixel gaps in cells(maybe a pygame issue)
+
+→cells get filled on pressing play button(sometimes)
