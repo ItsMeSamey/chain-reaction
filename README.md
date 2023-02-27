@@ -25,9 +25,6 @@ A Brain 🙃
 
 
 # Bugs
-★only when rows>>columns 
-→textsize too large
 
-→1 pixel gaps in cells(maybe a pygame issue)
+→cells get filled on pressing play button (happens only if you changed something in settings)
 
-→cells get filled on pressing play button(sometimes)
