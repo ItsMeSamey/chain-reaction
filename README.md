@@ -26,7 +26,7 @@ A Brain 🙃
 
 # Bugs
 ★only when rows>>columns 
-→textsize too large
+
 
 →1 pixel gaps in cells(maybe a pygame issue)
 
