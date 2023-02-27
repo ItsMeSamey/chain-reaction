@@ -10,10 +10,10 @@ screen_y = 2200
 #adjusted for my smartphone display
 #keep screen_x value in check to prevent grid from going out of bounds
 
-sizeofboard_x = 8
+sizeofboard_x = 3
 #number of columns, default 8
 
-sizeofboard_y =16
+sizeofboard_y =10
 #number of rows, default 16
 
 players=2
@@ -42,7 +42,7 @@ init =0
 color=[]
 color_brighter = []
 losers=[0 for i in range(players)]
-
+padding =[0,0]
 
 screen = pygame.display.set_mode((screen_x,screen_y))
 pygame.display.set_caption("Chain Reaction")
@@ -65,10 +65,17 @@ def initializer():
         for i in range(players*2):
             recolor(color,distinctcoloring)
 
+def repadding():
+    global padding
+    if screen_x/sizeofboard_x<screen_y/sizeofboard_y:
+        padding = [0,(screen_y-cx*sizeofboard_y)/2]
+    elif screen_x/sizeofboard_x>screen_y/sizeofboard_y:
+        padding =[(screen_x-cx*sizeofboard_x)/2,0]
 initializer()
-
-
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+repadding()
+print(cx)
+print(padding)
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 class ball:
@@ -90,12 +97,12 @@ class ball:
         self.limit = len(self.surroundings)-1
     def draw(self):
         if self.colornumber!=0 and self.limit-self.number!=0:
-            pygame.draw.rect(screen, color[self.colornumber-1], ( (self.x)*(cx), (self.y)*(cx), (cx), (cx) ),0,)
+            pygame.draw.rect(screen, color[self.colornumber-1], ( (self.x)*(cx)+padding[0]-1, (self.y)*(cx)+padding[1]-1, (cx)+2, (cx)+2 ))
             font = pygame.font.SysFont('aria2', text_size)
             text = font.render(str(self.number), 1, (255,255,255))
             screen.blit(text, ((self.x)*(cx)+delta_x, (self.y)*(cx)+delta_y))
         elif  self.colornumber!=0:
-            pygame.draw.rect(screen, color_brighter[self.colornumber-1], ( (self.x)*(cx), (self.y)*(cx), (cx), (cx) ))
+            pygame.draw.rect(screen, color_brighter[self.colornumber-1], ( (self.x)*(cx)+padding[0]-1, (self.y)*(cx)+padding[1]-1, 2+(cx),2+ (cx) ))
             font = pygame.font.SysFont('aria2', text_size)
             text = font.render(str(self.number), 1, (255,255,255))
             screen.blit(text, ((self.x)*(cx)+delta_x, (self.y)*(cx)+delta_y))
@@ -150,13 +157,14 @@ def beam(x,y,playernumber):
             update=0
 
 def drawboard():
-    for i in range(sizeofboard_x):
-        pygame.draw.line(screen, (90, 80, 90), ((i+1)*(cx), 0), ((i+1)*(cx), cx*sizeofboard_y), 1)
-    for i in range(sizeofboard_y):
-        pygame.draw.line(screen, (90, 80, 90), (0, (i+1)*(cx)), (cx*sizeofboard_x, (i+1)*(cx)), 1)
+    for i in range(sizeofboard_x+1):
+        pygame.draw.line(screen, (90, 80, 90), (((i)*cx)+padding[0] , padding[1]), (((i)*cx)+padding[0], cx*sizeofboard_y+padding[1]), 1)
+    for i in range(sizeofboard_y+1):
+        pygame.draw.line(screen, (90, 80, 90), (padding[0], ((i)*cx)+padding[1]), (cx*sizeofboard_x+padding[0], ((i)*cx)+padding[1]), 1)
 
 def redraw():
     screen.fill((0, 0, 10))
+    drawboard()
     drawboard()
     global update
     for i in range(sizeofboard_x):
@@ -186,7 +194,12 @@ def declarewinner():
                 text = font.render('Player ' + str(i) +' wins!!!! ', 1, (0,0,0))
                 screen.blit(text, (screen_x*(2.8/10),screen_y/2))
                 pygame.display.update()
-                delayy()
+                pygame.time.delay(2000)
+                global init
+                global paused
+                init =0
+                paused =1
+                pygame.display.update()
 
 
 def decoration():
@@ -294,6 +307,7 @@ while True:
                             while paused == 5:
                                 screen.fill((0,0,20))
                                 cx=min(screen_x/sizeofboard_x,screen_y/sizeofboard_y)
+                                repadding()
                                 drawboard()
                                 layer1p_clicked = layer1_bp.draw('‹',16,43,120)
                                 layer1n_clicked = layer1_bn.draw('›',12,43,120)
@@ -360,13 +374,13 @@ while True:
                 elif quit_clicked:
                     pygame.quit()
                 pygame.display.update()
-        elif event.type == pygame.MOUSEBUTTONDOWN and paused == -1:
+        elif paused == -1 and event.type == pygame.MOUSEBUTTONDOWN:
             while losers[playernumber]==1:
                 playernumber += 1
                 playernumber=playernumber%players
             x,y = pygame.mouse.get_pos()
-            x = int(x//(cx))
-            y = int(y//(cx))
+            x = int((x-padding[0])//(cx))
+            y = int((y-padding[1])//(cx))
             if x < sizeofboard_x and y < sizeofboard_y:
                 if board[x][y].colornumber == ((playernumber%players)+1) or board[x][y].colornumber == 0 :
                     beam(x,y,(playernumber%players)+1)
@@ -375,8 +389,8 @@ while True:
                 redraw()
         elif init ==0:
             losers=[0 for i in range(players)]
-            glob=globalizer(sizeofboard_x,cx)
-            delta_x,delta_y,text_size=glob[0],glob[1],glob[2]
+            glob=globalizer(cx,screen_x)
+            delta_x,delta_y,text_size=glob[0]+padding[0],glob[1]+padding[1],glob[2]
             averagecolor = tuple(averagecolorer(color,players))
             init =1
             board = [ ]

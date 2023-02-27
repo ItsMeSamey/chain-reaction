@@ -2,25 +2,27 @@ import random
 import math
 import colorsys
 
-def globalizer(sizeofboard_x,cx):
-    const1=(1-1/math.log(sizeofboard_x+2.5))*math.atan(sizeofboard_x)*3.2/math.pi
-    const2 = (1/sizeofboard_x)+(((1/sizeofboard_x) + math.atan(sizeofboard_x)*2/math.pi))*(math.pi/2)/math.atan(sizeofboard_x)
+def globalizer(cx,screen_x):
+#    sizeofboard = int((sizeofboard_x+sizeofboard_y)/2)
+    sizeofboard=round(screen_x/cx)
+    const1=(1-1/math.log(sizeofboard+2.5))*math.atan(sizeofboard)*3.2/math.pi
+    const2 = (1/sizeofboard)+(((1/sizeofboard) + math.atan(sizeofboard)*2/math.pi))*(math.pi/2)/math.atan(sizeofboard)
 #scaling factors for text size, x offset,y offset
 #dont ask how i came up with these :)
 
-    if sizeofboard_x<18:
+    if sizeofboard<18:
         const3=const2
-    elif sizeofboard_x<65:
-    	const3=(1/const2)-1/sizeofboard_x
+    elif sizeofboard<65:
+    	const3=(1/const2)-1/sizeofboard
     else:
-    	const3= 1/const2 -math.log10(math.log2(sizeofboard_x))	
-    if sizeofboard_x<13:
+    	const3= 1/const2 -math.log10(math.log2(sizeofboard))	
+    if sizeofboard<13:
     	const4 = (const3**1.72)*(const1)
     else:
     	const4=1
     delta_x = round(cx*const4*30/108)
     delta_y = round(cx*const3*20/108)
-    text_size = round(1100*const1/sizeofboard_x)
+    text_size = round(1100*const1/sizeofboard)
     return (delta_x,delta_y,text_size)
 
 
