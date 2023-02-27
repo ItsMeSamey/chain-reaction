@@ -55,7 +55,7 @@ def recolor(color,distinctcoloring):
 def brightner(color):
     #final = (round(125*color[0]/255 +130),round(125*color[1]/255 +130),round(125*color[2]/255 +130))
     hsv=colorsys.rgb_to_hsv(color[0]/255,color[1]/255,color[2]/255)
-    col = (hsv[0]*0.92+0.02,hsv[1]*0.95 +0.05,hsv[2]*0.95+0.05)
+    col = (hsv[0]*0.97+0.03,hsv[1]*0.95 +0.05,hsv[2]*0.95+0.05)
     coll = colorsys.hsv_to_rgb(col[0],col[1],col[2])
     colll=(coll[0]*255,coll[1]*255,coll[2]*255)
     return colll
@@ -65,7 +65,7 @@ def generate_random_hsv(num):
     color_hsv=[]
     r=random.randint(0,1000)
     for i in range(num):
-        color_hsv.append(((r+ i*1000/num)/1000, random.randint(200,1000)/1000,random.randint(250,1000)/1000))
+        color_hsv.append((( (r+ i*1000/num+ int(bool(num))*random.randint(round(1000/(num**2)),math.ceil(1000/num)))/1000, random.randint(200,1000)/1000,random.randint(250,1000)/1000)))
     for col in color_hsv:
         colll = colorsys.hsv_to_rgb(col[0],col[1],col[2])
         coll=[]
@@ -73,9 +73,10 @@ def generate_random_hsv(num):
             coll.append(255*i)
         color.append(tuple(coll))
     for col in color_hsv:
-        colll = colorsys.hsv_to_rgb((((col[0]+0.03)*1000)%1000)/1000,(col[1]),(col[2])-0.05)
+        colll = colorsys.hsv_to_rgb((((col[0]+0.01)*1000)%1000)/1000,(col[1]*1.02)-0.02,(col[2])-0.05)
         coll=[]
         for i in colll:
             coll.append(255*i)
         color_brighter.append(tuple(coll))
     return (color,color_brighter)
+    
