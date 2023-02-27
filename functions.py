@@ -25,6 +25,11 @@ def globalizer(cx,screen_x):
     text_size = round(1100*const1/sizeofboard)
     return (delta_x,delta_y,text_size)
 
+def ceil(x):
+    return math.ceil(x)
+
+def floor(x):
+    return math.floor(x)
 
 def averagecolorer(color,players):
     average =[0,0,0]
@@ -82,3 +87,5 @@ def generate_random_hsv(num):
         color_brighter.append(tuple(coll))
     return (color,color_brighter)
     
+
+

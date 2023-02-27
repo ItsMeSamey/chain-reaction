@@ -1,7 +1,8 @@
 #pylint:disable=W0621
 import pygame
 import pygame.gfxdraw
-from functions import averagecolorer,randomcolor,recolor,globalizer,brightner,generate_random_hsv
+import random
+from functions import averagecolorer,randomcolor,recolor,globalizer,brightner,generate_random_hsv,ceil,floor
 pygame.init()
 #initalization...
 
@@ -10,7 +11,7 @@ screen_y = 2200
 #adjusted for my smartphone display
 #keep screen_x value in check to prevent grid from going out of bounds
 
-sizeofboard_x = 3
+sizeofboard_x = 5
 #number of columns, default 8
 
 sizeofboard_y =10
@@ -18,10 +19,6 @@ sizeofboard_y =10
 
 players=2
 #number of players, default 2
-
-cx=min(screen_x/sizeofboard_x,screen_y/sizeofboard_y)
-#cx = screen_y/sizeofboard_y
-#maybe enable seacond option for pc , i didnt test it
 
 paused =1
 #1,0 to show or to not show pause menu
@@ -33,8 +30,25 @@ distinctcoloring= 25
 #tries to make colors more distinct ; too big of a value will make no diffrence at all
 #only when randomcoloring is set to 1
 
-
+width_incomplete =0
+#how transtaparent is a cell(only those not about to blast)
+#value from 0 to 255
 #initialized
+
+
+def readfile():
+    global sizeofboard_x,sizeofboard_y,players,width_incomplete
+    file = open('settings','r')
+    line = file.read().split(' ')
+    sizeofboard_x,sizeofboard_y,players,width_incomplete=int(line[0]),int(line[1]),int(line[2]),int(line[3])
+    file.close()
+
+def writefile():
+    file = open('settings','w')
+    file.write(str(sizeofboard_x)+' '+str(sizeofboard_y)+' '+str(players)+' '+str(width_incomplete))
+    file.close()
+
+readfile()
 
 update = 0
 playernumber = 0
@@ -43,6 +57,8 @@ color=[]
 color_brighter = []
 losers=[0 for i in range(players)]
 padding =[0,0]
+cx=min(screen_x/sizeofboard_x,screen_y/sizeofboard_y)
+
 
 screen = pygame.display.set_mode((screen_x,screen_y))
 pygame.display.set_caption("Chain Reaction")
@@ -73,10 +89,8 @@ def repadding():
         padding =[(screen_x-cx*sizeofboard_x)/2,0]
 initializer()
 repadding()
-print(cx)
-print(padding)
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+width_complete=0
 
 class ball:
     def __init__(self,xy,number,color):
@@ -97,12 +111,12 @@ class ball:
         self.limit = len(self.surroundings)-1
     def draw(self):
         if self.colornumber!=0 and self.limit-self.number!=0:
-            pygame.draw.rect(screen, color[self.colornumber-1], ( (self.x)*(cx)+padding[0]-1, (self.y)*(cx)+padding[1]-1, (cx)+2, (cx)+2 ))
+            pygame.draw.rect(screen, color[self.colornumber-1], ( floor((self.x)*(cx)+padding[0])+width_incomplete, floor((self.y)*(cx)+padding[1])+width_incomplete, ceil(cx)-width_incomplete, ceil(cx)-width_incomplete ),width_incomplete+1*int(bool(width_incomplete)))
             font = pygame.font.SysFont('aria2', text_size)
             text = font.render(str(self.number), 1, (255,255,255))
             screen.blit(text, ((self.x)*(cx)+delta_x, (self.y)*(cx)+delta_y))
         elif  self.colornumber!=0:
-            pygame.draw.rect(screen, color_brighter[self.colornumber-1], ( (self.x)*(cx)+padding[0]-1, (self.y)*(cx)+padding[1]-1, 2+(cx),2+ (cx) ))
+            pygame.draw.rect(screen, color_brighter[self.colornumber-1], ( floor((self.x)*(cx)+padding[0])+width_complete, floor((self.y)*(cx)+padding[1])+width_complete, ceil(cx)-width_complete, ceil(cx)-width_complete ),width_complete+1*int(bool(width_complete)))
             font = pygame.font.SysFont('aria2', text_size)
             text = font.render(str(self.number), 1, (255,255,255))
             screen.blit(text, ((self.x)*(cx)+delta_x, (self.y)*(cx)+delta_y))
@@ -220,7 +234,24 @@ def delayy():
     pygame.quit()
 
 
+def randomcoords(x):
+    return [[[[random.randint(0,screen_x),random.randint(0,screen_y)] for i in range(random.randint(3,22))] for j in range(x)], [randomcolor() for k in range(x)]]
 
+beziers = randomcoords(21)
+for i in range(len(beziers[1])):
+    beziers[0][i].append(beziers[0][i][0])
+    beziers[0][i].append(beziers[0][i][1])
+
+def update_bezier():
+    for i in range(len(beziers[1])):
+        for j in range(len(beziers[0][i])):
+            beziers[0][i][j][0] +=random.randint(-100,100)/100
+            beziers[0][i][j][1] +=random.randint(-100,100)/100
+def drawcurves():
+    screen.fill((0,0,20))
+    for i in range(len(beziers[1])):
+        pygame.gfxdraw.bezier(screen,beziers[0][i],20,beziers[1][i])
+        update_bezier()
 
 play_b = Button(screen_x/2,screen_y*1/10,220,110,randomcolor(),0,60)
 players_b  = Button(screen_x/2,screen_y*2/10,330,110,randomcolor(),0,60)
@@ -239,12 +270,13 @@ layer2_bn = Button(screen_x*2/3,screen_y/5,100,100,layer2_bp.color,0,100)
 
 while True:
     clock.tick(60)
+    update_bezier()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
         elif paused >0:
-            if paused==1:
-                screen.fill((0,0,20))
+            if True:
+                drawcurves()
                 play_clicked = play_b.draw('Play',62,30,90)
                 colors_clicked = colors_b.draw('Colors',100,30,90)
                 settngs_clicked = settings_b.draw('Settings',130,30,90)
@@ -253,7 +285,7 @@ while True:
                    paused =0
                 elif colors_clicked:
                     paused = 2
-                    screen.fill((0,0,20))
+                    drawcurves()
                     cbuttons = []
                     cboxes = int(players**(1/2))
                     player_diffrence = players-cboxes**2
@@ -292,7 +324,7 @@ while True:
                             pygame.display.update()  
                 elif settngs_clicked:
                     paused=3
-                    screen.fill((0,0,20))
+                    drawcurves()
                     while paused >2:
                         backbutton_clicked = backbutton.draw('«',25,42,120)
                         players_clicked = players_b.draw('Players',120,30,90)
@@ -301,11 +333,13 @@ while True:
                         if backbutton_clicked:
                             paused = 1
                             backbutton_clicked = False
+                            writefile
                         elif gridsize_clicked:
                             paused = 5
+                            play_b_3 = Button(screen_x/2,screen_y*3/10,220,110,randomcolor(),0,60)
                             anychanges =False
                             while paused == 5:
-                                screen.fill((0,0,20))
+                                screen.fill((0,0,10))
                                 cx=min(screen_x/sizeofboard_x,screen_y/sizeofboard_y)
                                 repadding()
                                 drawboard()
@@ -313,6 +347,7 @@ while True:
                                 layer1n_clicked = layer1_bn.draw('›',12,43,120)
                                 layer2p_clicked = layer2_bp.draw('‹',16,43,120)
                                 layer2n_clicked =layer2_bn.draw('›',12,43,120)
+                                play3_clicked = False #play_b_3.draw('Play',62,30,90)
                                 backbutton_clicked = backbutton.draw('«',25,42,120)
                                 font = pygame.font.SysFont('aria2', 120)
                                 text = font.render(str(sizeofboard_x), 1, (255,255,255))
@@ -320,6 +355,8 @@ while True:
                                 font = pygame.font.SysFont('aria2', 120)
                                 text = font.render(str(sizeofboard_y), 1, (255,255,255))
                                 screen.blit(text,(screen_x/2-20*(len(str(players))),screen_y*2/10- 35))
+                                if play3_clicked:
+                                    paused = 0
                                 if layer1p_clicked:
                                     if sizeofboard_x>1:
                                         sizeofboard_x-=1
@@ -338,15 +375,15 @@ while True:
                                     backbutton_clicked=False
                                     paused = 3
                                 pygame.display.update()
-                            screen.fill((0,0,20))
+                            drawcurves()
                             if anychanges==True:
                                 init = 0
                         elif players_clicked:
                             paused =4
-                            screen.fill((0,0,20))
+                            drawcurves()
                             anychanges=False
                             while paused ==4:
-                                screen.fill((0,0,20))
+                                drawcurves()
                                 layer1p_clicked = layer1_bp.draw('‹',16,43,120)
                                 layer1n_clicked = layer1_bn.draw('›',12,43,120)
                                 backbutton_clicked = backbutton.draw('«',25,42,120)
@@ -364,7 +401,7 @@ while True:
                                     backbutton_clicked=False
                                     paused = 3
                                 pygame.display.update()
-                            screen.fill((0,0,20))
+                            drawcurves()
                             if anychanges==True:
                                 initializer()
                         sizeofy_bp = Button(screen_x*1/3,screen_y*3/10,100,100,randomcolor(),0,100)
@@ -372,22 +409,28 @@ while True:
                         
                         pygame.display.update()
                 elif quit_clicked:
+                    writefile()
                     pygame.quit()
                 pygame.display.update()
-        elif paused == -1 and event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN and init ==1:
             while losers[playernumber]==1:
                 playernumber += 1
                 playernumber=playernumber%players
             x,y = pygame.mouse.get_pos()
+            xy=bool(x-padding[0]>0 and y-padding[1]>0)
             x = int((x-padding[0])//(cx))
             y = int((y-padding[1])//(cx))
-            if x < sizeofboard_x and y < sizeofboard_y:
+            if xy and x < sizeofboard_x and y < sizeofboard_y and paused==-1:
                 if board[x][y].colornumber == ((playernumber%players)+1) or board[x][y].colornumber == 0 :
                     beam(x,y,(playernumber%players)+1)
                     playernumber += 1
                     playernumber = playernumber%players
                 redraw()
+            if paused==0:
+                pygame.time.delay(100)
+                paused =-1
         elif init ==0:
+            writefile()
             losers=[0 for i in range(players)]
             glob=globalizer(cx,screen_x)
             delta_x,delta_y,text_size=glob[0]+padding[0],glob[1]+padding[1],glob[2]
@@ -400,6 +443,5 @@ while True:
                     ki.append(ball((i,j),0,0))
                 board.append(ki[:])
             redraw()
-            paused=-1
 pygame.quit()
 
