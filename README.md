@@ -1,4 +1,4 @@
-in# chain-reaction
+# chain-reaction
 recreation of chain reaction game using python with any number of players and gridsizes
 
 open chainreaction.py file to change settings, under '#initialization'
