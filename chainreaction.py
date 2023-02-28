@@ -7,7 +7,7 @@ pygame.init()
 #initalization...
 
 screen_x = 1080
-screen_y = 2200
+screen_y = 2000
 #adjusted for my smartphone display
 #keep screen_x value in check to prevent grid from going out of bounds
 
@@ -34,6 +34,11 @@ width_incomplete =0
 #how transtaparent is a cell(only those not about to blast)
 #value from 0 to 255
 #initialized
+
+animated_background= 2
+
+background = 1
+
 
 
 def readfile():
@@ -235,23 +240,38 @@ def delayy():
 
 
 def randomcoords(x):
-    return [[[[random.randint(0,screen_x),random.randint(0,screen_y)] for i in range(random.randint(3,22))] for j in range(x)], [randomcolor() for k in range(x)]]
+    return [[[[random.randint(0,screen_x),random.randint(0,screen_y)] for i in range(random.randint(3,30))] for j in range(x)], [randomcolor() for k in range(x)]]
 
-beziers = randomcoords(12)
-for i in range(len(beziers[1])):
-    beziers[0][i].append(beziers[0][i][0])
-    beziers[0][i].append(beziers[0][i][1])
+beziers = randomcoords(15)
+#for i in range(len(beziers[1])):
+#    beziers[0][i].append(beziers[0][i][0])
+#    beziers[0][i].append(beziers[0][i][1])
 
 def update_bezier():
     for i in range(len(beziers[1])):
         for j in range(len(beziers[0][i])):
-            beziers[0][i][j][0] +=random.randint(-100,100)/100
-            beziers[0][i][j][1] +=random.randint(-100,100)/100
-def drawcurves():
-    screen.fill((0,0,20))
+            beziers[0][i][j][0] =(beziers[0][i][j][0]+random.randint(-100,100)/25)%screen_x
+            beziers[0][i][j][1] = (beziers[0][i][j][1]-random.randint(-100,100)/25)%screen_y
+
+def old_update_bezier():
     for i in range(len(beziers[1])):
-        pygame.gfxdraw.bezier(screen,beziers[0][i],20,beziers[1][i])
-        update_bezier()
+        for j in range(len(beziers[0][i])):
+            beziers[0][i][j][0] +=random.randint(-100,100)/50
+            beziers[0][i][j][1] +=random.randint(-100,100)/50
+
+
+def drawcurves():
+    global beziers
+    if background:
+        for i in range(len(beziers[1])):
+            pygame.gfxdraw.bezier(screen,beziers[0][i],20,beziers[1][i])
+        if animated_background==1:
+            update_bezier()
+        elif animated_background==2:
+            old_update_bezier()
+        elif animated_background == 3:
+            beziers = randomcoords(15)
+
 
 play_b = Button(screen_x/2,screen_y*1/10,220,110,randomcolor(),0,60)
 players_b  = Button(screen_x/2,screen_y*2/10,330,110,randomcolor(),0,60)
@@ -282,10 +302,11 @@ while True:
                 settngs_clicked = settings_b.draw('Settings',130,30,90)
                 quit_clicked = quit_b.draw('Quit',67,30,90)
                 if play_clicked:
+                   screen.fill((0,0,0))
                    paused =0
                 elif colors_clicked:
+                    screen.fill((0,0,0))
                     paused = 2
-                    drawcurves()
                     cbuttons = []
                     cboxes = int(players**(1/2))
                     player_diffrence = players-cboxes**2
@@ -305,6 +326,7 @@ while True:
                                 nu_deltaa = (screen_x - (player_diffrence* cbox_width))/(player_diffrence+1)
                                 cbuttons.append(Button((nu_deltaa+cbox_width)*j+nu_deltaa+cbox_width/2,(deltaa+cbox_width)*(players//cboxes) +deltaa+cbox_width/2,cbox_width,cbox_width,color[cboxes**2+j],0,1000))
                         while paused !=1:
+                            drawcurves()
                             backbutton_clicked = backbutton.draw('«',25,42,120)
                             if backbutton_clicked:
                                 paused=1
@@ -321,20 +343,27 @@ while True:
                             font = pygame.font.SysFont('aria2', 90)
                             text = font.render('Click to change colors', 1, (255,255,255))
                             screen.blit(text,(screen_x/2-330,screen_y*9/10))
-                            pygame.display.update()  
+                            pygame.display.update()
+                            if paused==1:
+                                screen.fill((0,0,0))
+                                break
                 elif settngs_clicked:
+                    screen.fill((0,0,0))
                     paused=3
                     drawcurves()
                     while paused >2:
+                        drawcurves()
                         backbutton_clicked = backbutton.draw('«',25,42,120)
                         players_clicked = players_b.draw('Players',120,30,90)
                         gridsize_clicked = gridsize_b.draw('Grid Size',142,30,90)
                         
                         if backbutton_clicked:
+                            screen.fill((0,0,0))
                             paused = 1
                             backbutton_clicked = False
                             writefile
                         elif gridsize_clicked:
+                            screen.fill((0,0,0))
                             paused = 5
                             play_b_3 = Button(screen_x/2,screen_y*3/10,220,110,randomcolor(),0,60)
                             anychanges =False
@@ -372,6 +401,7 @@ while True:
                                     sizeofboard_y+=1
                                     anychanges=True
                                 elif backbutton_clicked:
+                                    screen.fill((0,0,0))
                                     backbutton_clicked=False
                                     paused = 3
                                 pygame.display.update()
@@ -379,11 +409,14 @@ while True:
                             if anychanges==True:
                                 init = 0
                         elif players_clicked:
+                            screen.fill((0,0,0))
                             paused =4
                             drawcurves()
                             anychanges=False
                             while paused ==4:
-                                drawcurves()
+                                screen.fill((0,0,0))
+                                for i in range(len(beziers[1])):
+                                    pygame.gfxdraw.bezier(screen,beziers[0][i],20,beziers[1][i])
                                 layer1p_clicked = layer1_bp.draw('‹',16,43,120)
                                 layer1n_clicked = layer1_bn.draw('›',12,43,120)
                                 backbutton_clicked = backbutton.draw('«',25,42,120)
@@ -398,6 +431,7 @@ while True:
                                     players+=1
                                     anychanges=True
                                 elif backbutton_clicked:
+                                    screen.fill((0,0,0))
                                     backbutton_clicked=False
                                     paused = 3
                                 pygame.display.update()
@@ -440,7 +474,10 @@ while True:
             for i in range(sizeofboard_x):
                 ki =[]
                 for j in range(sizeofboard_y):
-                    ki.append(ball((i,j),0,0))
+                    bl =ball((i,j),0,0)
+                    bl.number=random.randint(0,bl.limit)
+                  #  bl.colornumber = random.randint(1,2)
+                    ki.append(bl)
                 board.append(ki[:])
             redraw()
 pygame.quit()
